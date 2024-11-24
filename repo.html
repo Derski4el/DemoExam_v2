@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список заявок</title>
+</head>
+
+<body>
+    <h1>Уведомления об изменениях</h1>
+    {% for i in alert %}
+    {{ i }} <br>
+    {% endfor %}
+    <h1>Список заявок</h1>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Дата добавления</th>
+            <th>Оборудование</th>
+            <th>Тип неисправности</th>
+            <th>Описание проблемы</th>
+            <th>Клиент</th>
+            <th>Статус</th>
+            <th>Мастер</th>
+            <th>Комментарий</th>
+            <th>Дата завершения</th>
+        </tr>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.startDate.strftime('%Y-%m-%d') }}</td>
+            <td>{{ order.oborodovanie }}</td>
+            <td>{{ order.problema }}</td>
+            <td>{{ order.opicanieproblem }}</td>
+            <td>{{ order.client }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.worker }}</td>
+            <td>{{ order.com }}</td>
+            <td>{{ order.endDate.strftime('%Y-%m-%d') if order.endDate else 'Н/Д' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form action="/postdata" method="post">
+        <h2>Добавить новую заявку</h2>
+        <table>
+            <tr>
+                <td>Номер заявки</td>
+                <td><input id="id" name="id" placeholder="Номер заявки" required></td>
+            </tr>
+            <tr>
+                <td>Дата добавления</td>
+                <td><input id="startDate" name="startDate" type="date" required></td>
+            </tr>
+            <tr>
+                <td>Оборудование</td>
+                <td><input id="oborodovanie" name="oborodovanie" placeholder="Оборудование" required></td>
+            </tr>
+            <tr>
+                <td>Тип неисправности</td>
+                <td><input id="problema" name="problema" placeholder="Тип неисправности" required></td>
+            </tr>
+            <tr>
+                <td>Описание проблемы</td>
+                <td><input id="opicanieproblem" name="opicanieproblem" placeholder="Описание проблемы" required></td>
+            </tr>
+            <tr>
+                <td>Клиент</td>
+                <td><input id="client" name="client" placeholder="Клиент" required></td>
+            </tr>
+            <tr>
+                <td>Статус заявки</td>
+                <td>
+                    <select id="status" name="status" required>
+                        <option value="Ожидания">Ожидания</option>
+                        <option value="В работе">В работе</option>
+                        <option value="Завершено">Завершено</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Комментарий</td>
+                <td><input id="com" name="com" placeholder="Комментарий"></td>
+            </tr>
+            <tr>
+                <td>Мастер</td>
+                <td><input id="worker" name="worker" placeholder="Мастер" required></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button type="submit" id="save">Сохранить и отправить</button></td>
+            </tr>
+        </table>
+    </form>
+    <script>
+        if (!sessionStorage.getItem("token"))
+            window.location.href = "auth";
+    </script>
+</body>
+
+</html>

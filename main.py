@@ -7,6 +7,7 @@ from typing import Optional
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+alert = []
 class Orders:
     def __init__(self, id, start_date, oborodovanie, problema, opicanieproblem, client, status, worker, com):
         self.id = id
@@ -23,7 +24,6 @@ class Orders:
         if self.status == "Завершено":
             self.endDate = datetime.now()
 
-# Хранилище для заказов
 repo = [
     Orders(1, datetime(2024, 11, 25), "Рука", "Что-то", "Болит", "9", "Завершено", "Помогите пж", "Вася"),
     Orders(2, datetime(2024, 9, 22), "Нога", "Где-то", "Работает", "10", "Ожидания", "Помогите пж", "Вася"),
@@ -34,13 +34,15 @@ repo = [
     Orders(7, datetime(2024, 10, 27), "Голова", "Когда-то", "Живая", "11", "Ожидания", "Помогите пж", "Вася"),
     Orders(8, datetime(2024, 10, 28), "Другая нога", "Почему-то", "Ходит", "12", "Завершено", "Помогите пж", "Вася")
 ]
+
+
 @app.get("/", response_class=HTMLResponse)
 def get_orders(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "orders": repo})
 
 @app.get("/repo", response_class=HTMLResponse)
 def get_orders(request: Request):
-    return templates.TemplateResponse("repo.html", {"request": request, "orders": repo})
+    return templates.TemplateResponse("repo.html", {"request": request, "orders": repo, "alert": alert})
 
 @app.post("/postdata")
 def postdata(
@@ -51,13 +53,12 @@ def postdata(
     opicanieproblem: str = Form(),
     client: str = Form(),
     status: str = Form(),
-    worker: str = Form(),
-    com: str = Form(default="Не назначен")
+    worker: str = Form(default="Не назначен"),
+    com: str = Form(default="")
 ):
     if any(order.id == id for order in repo):
         raise HTTPException(status_code=400, detail="Заявка с таким ID уже существует")
-
-    # Преобразование даты
+    
     try:
         start_date = datetime.strptime(startDate, "%Y-%m-%d")
     except ValueError:
@@ -76,7 +77,6 @@ def postdata(
         com=com
     )
     
-    # Установка даты завершения, если статус "Завершено"
     if status == "Завершено":
         new_order.endDate = datetime.now()
 
@@ -101,20 +101,23 @@ def update_order(
     opicanieproblem: str = Form(),
     client: str = Form(),
     status: str = Form(),
-    worker: str = Form(),
-    com: str = Form(default="Не назначен")
+    worker: str = Form(default="Не назначен"),
+    com: str = Form(default="")
 ):
+
     order_to_update = next((order for order in repo if order.id == id), None)
     if order_to_update is None:
         raise HTTPException(status_code=404, detail="Заказ не найден")
 
-    # Преобразование даты
+
     try:
         start_date = datetime.strptime(startDate, "%Y-%m-%d")
     except ValueError:
         raise HTTPException(status_code=400, detail="Некорректный формат даты")
 
-    # Обновление заказа
+    if order_to_update.status != status:
+        alert.append(f"Обновленна статутс {order_to_update.id} заменен на  {order_to_update.status}")
+
     order_to_update.startDate = start_date
     order_to_update.oborodovanie = oborodovanie
     order_to_update.problema = problema

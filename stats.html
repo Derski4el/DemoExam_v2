@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика</title>
+</head>
+
+<body>
+    <h1>Статистика</h1>
+    <div>
+        {% if stat_type == 'completed_orders' %}
+        <h2>Завершенные заявки</h2>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Дата добавления</th>
+                <th>Оборудование</th>
+                <th>Тип неисправности</th>
+                <th>Описание проблемы</th>
+                <th>Клиент</th>
+                <th>Статус заявки</th>
+                <th>Мастер</th>
+                <th>Комментарий</th>
+            </tr>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.startDate.strftime('%Y-%m-%d') }}</td>
+                <td>{{ order.oborodovanie }}</td>
+                <td>{{ order.problema }}</td>
+                <td>{{ order.opicanieproblem }}</td>
+                <td>{{ order.client }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.worker }}</td>
+                <td>{{ order.com }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% elif stat_type == 'problem_counts' %}
+        <h2>Статистика по проблемам</h2>
+        <ul>
+            {% for problema, count in problem_counts.items() %}
+            <li>{{ problema }}: {{ count }} заявок</li>
+            {% endfor %}
+        </ul>
+        {% elif stat_type == 'average_time' %}
+        <h2>Среднее время выполнения завершённых заявок</h2>
+        {% if average_time is not none %}
+        <p>Среднее время выполнения (дни): {{ average_time }}</p>
+        {% else %}
+        <p>Нет завершённых заявок для расчета среднего времени.</p>
+        {% endif %}
+        {% endif %}
+    </div>
+    <a href="/">Назад</a>
+    <script>
+        if (!sessionStorage.getItem("token"))
+            window.location.href = "auth";
+    </script>
+</body>
+
+</html>
