@@ -38,7 +38,7 @@ repo = [
 
 @app.get("/", response_class=HTMLResponse)
 def get_orders(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "orders": repo})
+    return templates.TemplateResponse("auth.html", {"request": request, "orders": repo})
 
 @app.get("/repo", response_class=HTMLResponse)
 def get_orders(request: Request):
